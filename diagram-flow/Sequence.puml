@@ -1,0 +1,133 @@
+@startuml Sequence Diagram
+title E-Commerce Watch Store - Sequence Diagram
+
+skinparam participant {
+  BackgroundColor White
+  BorderColor #2a688a
+}
+skinparam sequence {
+  ArrowColor #8e44ad
+  LifeLineBorderColor #8e44ad
+  LifeLineBackgroundColor #e3f2fd
+}
+
+box "Aktor"
+    participant Pengguna
+    participant AdminOperasional
+end box
+
+box "Sistem E-Commerce"
+    participant Sistem
+    participant Autentikasi
+    participant KatalogProduk
+    participant Keranjang
+    participant Pesanan
+    participant Pembayaran
+    participant ManajemenProduk
+    participant Produk
+end box
+
+== 1. Skenario: Pembelian Produk (Checkout) ==
+
+activate Pengguna
+Pengguna -> Autentikasi : login(email, password)
+activate Autentikasi
+Autentikasi -> Sistem : otorisasiLogin(Pengguna)
+alt Login Berhasil
+    Sistem -> Pengguna : tampilkanHalamanUtama()
+    deactivate Autentikasi
+    
+    Pengguna -> KatalogProduk : lihatKatalog()
+    activate KatalogProduk
+    KatalogProduk -> Pengguna : daftarProduk(list)
+    deactivate KatalogProduk
+    
+    Pengguna -> KatalogProduk : lihatDetailProduk(id_produk)
+    activate KatalogProduk
+    KatalogProduk -> Pengguna : tampilkanDetail(Produk)
+    deactivate KatalogProduk
+    
+    Pengguna -> Keranjang : tambahProduk(id_produk, jumlah)
+    activate Keranjang
+    Keranjang -> Keranjang : simpanItem(id_produk, jumlah)
+    
+    Pengguna -> Keranjang : checkout()
+    Keranjang -> Pesanan : buatPesananBaru(id_pengguna, item_keranjang)
+    activate Pesanan
+    Pesanan -> Pembayaran : instruksiPembayaran(total_bayar, "Transfer Bank")
+    activate Pembayaran
+    Pembayaran -> Pengguna : tampilkanInstruksi(rekening_bank)
+    deactivate Keranjang
+    
+    Pengguna -> Pembayaran : konfirmasiPembayaran(bukti_transfer)
+    Pembayaran -> Pesanan : updateStatus(id_pesanan, "Menunggu Konfirmasi")
+    deactivate Pembayaran
+    
+    Pengguna -> Pesanan : lihatStatusPesanan()
+    Pesanan -> Pengguna : statusPesanan("Menunggu Konfirmasi")
+else Login Gagal
+    Autentikasi -> Pengguna : pesanError("Kredensial salah")
+    deactivate Autentikasi
+end
+
+== 2. Skenario: Manajemen Produk (Tambah Produk) ==
+
+activate AdminOperasional
+AdminOperasional -> Autentikasi : loginDashboard(username, password)
+activate Autentikasi
+Autentikasi -> Sistem : otorisasiLogin(AdminOperasional)
+alt Login Berhasil
+    Sistem -> AdminOperasional : tampilkanDashboard()
+    deactivate Autentikasi
+    
+    AdminOperasional -> ManajemenProduk : navigasiManajemenProduk()
+    activate ManajemenProduk
+    AdminOperasional -> ManajemenProduk : tambahProdukForm()
+    
+    AdminOperasional -> ManajemenProduk : submitDataProduk(nama, deskripsi, harga, stok, gambar)
+    ManajemenProduk -> Produk : simpanProdukBaru(data_produk)
+    activate Produk
+    Produk -> ManajemenProduk : konfirmasiSimpan(id_produk_baru)
+    deactivate Produk
+    
+    ManajemenProduk -> AdminOperasional : notifikasiSukses("Produk berhasil ditambahkan")
+    deactivate ManajemenProduk
+    
+    AdminOperasional -> AdminOperasional : -- Alur Edit/Hapus Produk serupa --
+    
+else Login Gagal
+    Autentikasi -> AdminOperasional : pesanError("Kredensial salah")
+    deactivate Autentikasi
+end
+deactivate AdminOperasional
+
+== 3. Skenario: Pengelolaan Pesanan (Admin Operasional) ==
+
+activate AdminOperasional
+AdminOperasional -> Sistem : loginDashboardAdmin()
+activate Sistem
+Sistem -> AdminOperasional : tampilkanDashboard()
+deactivate Sistem
+
+AdminOperasional -> Pesanan : lihatPesananMasuk()
+activate Pesanan
+Pesanan -> AdminOperasional : daftarPesananBaru(list_pesanan)
+
+loop Untuk setiap pesanan dengan status "Menunggu Konfirmasi"
+    AdminOperasional -> Pembayaran : cekBuktiBayar(id_pesanan)
+    activate Pembayaran
+    Pembayaran -> AdminOperasional : tampilkanBuktiTransfer(gambar_url)
+    deactivate Pembayaran
+    
+    alt Bukti valid
+        AdminOperasional -> Pesanan : prosesStatusPesanan(id_pesanan, "Diproses")
+        Pesanan -> AdminOperasional : konfirmasiUpdateStatus("Diproses")
+    else Bukti tidak valid / Gagal
+        AdminOperasional -> Pesanan : prosesStatusPesanan(id_pesanan, "Batal/Gagal")
+        Pesanan -> AdminOperasional : konfirmasiUpdateStatus("Batal/Gagal")
+    end
+end
+deactivate Pesanan
+deactivate AdminOperasional
+
+@enduml

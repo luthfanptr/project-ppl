@@ -1,0 +1,70 @@
+@startuml Activity Admin Operasional
+
+|Admin Operasional|
+start
+repeat
+:Login Dashboard Admin;
+:Input Email;
+:Input Password;
+
+|Sistem|
+:Authentikasi Kredensial;
+backward :tampilkan pesan error;
+
+repeat while (Valid) is (Tidak) not (Ya)
+
+|Sistem|
+:Redirect dashboard admin;
+
+|Admin Operasional|
+repeat
+:Dashboard admin;
+if (Kelola Katalog) then (Ya)
+if (tambahkan produk) then (Ya)
+:Input Deskripsi Produk;
+:Simpan;
+        |Sistem|
+        :Menyimpan Perubahan;
+
+        |Admin Operasional|
+        :;
+
+    elseif (hapus produk) then (Ya)
+        |Sistem|
+        :Produk terhapus;
+        |Admin Operasional|
+        :Kembali ke Dashboard;
+    endif
+
+elseif (Cek Pesanan Masuk) then (Ya)
+    :Lihat Pesanan;
+
+    if (Pesanan Masuk) then (Ya)
+        :Ubah status menjadi diproses;
+
+        |Sistem|
+        :Status berubah menjadi diproses;
+
+        |Admin Operasional|
+        :Mengirim Pesanan;
+        :Ubah status menjadi dalam pengiriman;
+
+        |Sistem|
+        :Status berubah menjadi dikirim;
+        |Admin Operasional|
+    endif
+
+elseif (Lihat Laporan Penjualan) then (Ya)
+    |Sistem|
+    :Menampilkan laporan penjualan;
+    |Admin Operasional|
+    :Mengunduk laporan;
+    |Sistem|
+    :Laporan terunduh;
+    |Admin Operasional|
+endif
+
+repeat while (Masih menggunakan dashboard?)
+
+stop
+@enduml

@@ -1,0 +1,37 @@
+@startuml Usecase Admin Operasional
+
+actor "Admin Operasional" as adm 
+
+package "Sistem E-Commerce" {
+    usecase "Login Dashboard\nAdmin" as u1
+    usecase "Melihat daftar produk" as u2
+    usecase "Mengedit produk" as u3
+    usecase "Menambah produk" as u4
+    usecase "Mengisi deskripsi\ndetail produk" as u5
+    usecase "Menghapus produk" as u6
+
+    usecase "Melihat pesanan masuk" as u7
+    usecase "Memproses status pesanan" as u8
+
+    usecase "Melihat laporan penjualan" as u9
+    usecase "Mengunduh laporan penjualan" as u10
+}
+
+adm --> u1
+adm --> u2
+u1 <- u2 : <<include>>
+u2 .> u3 : <<extends>>
+u3 ..> u4 : <<extends>>
+u4 <- u5 : <<include>>
+u3 ..> u6 : <<extends>>
+
+adm --> u7
+u1 <-- u7 : <<include>>
+adm --> u8
+u7 <-- u8 : <<include>>
+
+adm --> u9
+adm --> u10
+u9 <-- u10 : <<include>>
+
+@enduml

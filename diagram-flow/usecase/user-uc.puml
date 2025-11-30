@@ -1,0 +1,40 @@
+@startuml Usecase User
+
+actor user as u 
+
+package "sistem ecommerce" {
+
+    usecase "Registrasi" as u1
+    usecase "Login" as u2
+    usecase "Kelola Profil" as u3
+    usecase "Lihat katalog produk" as u4
+    usecase "Lihat detail produk" as u5
+    usecase "Kelola keranjang" as u6
+    usecase "Tambah produk" as u7
+    usecase "Hapus produk" as u8
+    usecase "Checkout" as u9
+    usecase "Konfirmasi Pembayaran\n (Transfer Bank)" as u10
+    usecase "Lihat status pesanan" as u11
+}
+
+u --> u1
+u --> u2
+u1 <. u2  : <<include>>
+u2 ..> u3 : <<extends>>
+
+u --> u4
+u2 <.. u4 : <<include>>
+u4 ..> u5 : <<extends>>
+u --> u6
+u4 ..> u6 : <<extends>>
+u6 ..> u7 : <<extends>>
+u6 ..> u8 : <<extends>>
+
+u --> u9
+u6 <-- u9 : <<include>>
+u9 <-- u10 : <<include>>
+
+u --> u11
+u10 .> u11 : <<extends>>
+
+@enduml

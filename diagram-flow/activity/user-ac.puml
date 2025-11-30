@@ -1,0 +1,145 @@
+@startuml Activity User 
+
+|User|
+start
+:Buka Website;
+
+|Sistem|
+:Load Tampilan Utama;
+:Autentikasi Login;
+
+|User|
+if (Punya Akun?) then (Ya)
+    |Sistem|
+    :Redirect halaman login;
+
+    |User|
+    repeat
+        :Input Email;
+        :Input Password;
+
+        |Sistem|
+        :Cek Kredensial;
+    repeat while (Valid?) is (Tidak) not (Ya)
+
+else (Tidak)
+    |Sistem|
+    :Redirect halaman registrasi;
+
+    |User|
+    :Input Email;
+    :Input Password;
+    :Input No Telepon;
+
+    |Sistem|
+    :Simpan Akun Baru;
+endif
+
+|Sistem|
+:Redirect Tampilan Utama;
+
+|User|
+repeat
+    if (Menu?) then (Lihat Katalog)
+
+        repeat
+            :Lihat Katalog Produk;
+
+            if (Klik Detail Produk?) then (Ya)
+                :Lihat Detail Produk;
+
+                if (Tambah ke Keranjang?) then (Ya)
+                    :Tambah ke Keranjang;
+                endif
+
+                if (Checkout?) then (Ya)
+                    --> Pembayaran
+                else (Tidak)
+                    :Kembali ke Katalog;
+                endif
+
+            else (Tidak)
+                :Tetap di Katalog;
+            endif
+
+        repeat while (Belum Checkout)
+        break
+
+    elseif (Pesanan)
+
+        |Sistem|
+        :Ambil Status Pesanan;
+
+        |User|
+        if (Status?) then (Belum Dibayar)
+            :Status: Belum Dibayar;
+            :Bayar Sekarang?;
+
+            if (Bayar?) then (Ya)
+                --> Pembayaran
+            else (Tidak)
+                :Kembali ke Menu;
+            endif
+
+        elseif (Dikemas)
+            :Status: Dikemas;
+            :Kembali ke Menu;
+
+        elseif (Dikirim)
+            :Status: Dikirim;
+            :Kembali ke Menu;
+
+        elseif (Selesai)
+            :Status: Selesai;
+            :Kembali ke Menu;
+
+        elseif (Tidak Ada Pesanan)
+            :Tidak Ada Pesanan;
+            :Kembali ke Menu;
+        endif
+
+    elseif (Kelola Profil)
+
+        repeat
+            |User|
+            if (Ubah Username?) then (Ya)
+                :Input username baru;
+            elseif (Ubah No Telepon?) then (Ya)
+                :Input no telepon baru;
+            elseif (Ubah Alamat?) then (Ya)
+                :Input alamat baru;
+            elseif (Ubah Password?) then (Ya)
+                :Input password baru;
+            else (Selesai)
+                break
+            endif
+
+            |Sistem|
+            :Simpan Perubahan;
+
+        repeat while (Masih ingin mengubah?)
+
+    endif
+
+repeat while (Belum Checkout)
+
+' ==========================
+' 1 NODE PEMBAYARAN SAJA
+' ==========================
+label Pembayaran
+
+|User|
+:Pilih Metode Pembayaran;
+
+|Sistem|
+:Tampilkan Virtual Account / Instruksi Pembayaran;
+
+|User|
+:Melakukan Pembayaran;
+
+|Sistem|
+:Konfirmasi Pembayaran;
+
+stop
+
+@enduml

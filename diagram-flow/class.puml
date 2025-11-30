@@ -1,0 +1,136 @@
+@startuml Class Diagram
+!define ENTITY class
+!define ATTRIBUTE(name, type) name : type
+!define OPERATION(name) +name()
+
+' Aktor/Pengguna
+ENTITY Pengguna {
+    ATTRIBUTE(id_pengguna, int)
+    ATTRIBUTE(email, string)
+    ATTRIBUTE(password, string)
+    ATTRIBUTE(nama, string)
+    ATTRIBUTE(no_telepon, string)
+    ATTRIBUTE(alamat_pengiriman, text)
+    +registrasi()
+    +login()
+    +updateProfil(nama, no_telepon, alamat)
+    +lihatKatalogProduk()
+    +lihatDetailProduk()
+}
+
+' Kelas Aktor Admin
+abstract ENTITY Admin {
+    ATTRIBUTE(id_admin, int)
+    ATTRIBUTE(username, string)
+    ATTRIBUTE(password, string)
+    ATTRIBUTE(nama_admin, string)
+    +loginDashboardAdmin()
+}
+
+ENTITY AdminOperasional {
+    +lihatLaporanPenjualan()
+    +unduhLaporanPenjualan()
+    +lihatPesananMasuk()
+    +memprosesStatusPesanan()
+    +menambahProduk()
+    +mengeditProduk()
+    +menghapusProduk()
+    +mengisiDeskripsiDetailProduk()
+}
+
+ENTITY AdminIT {
+    +maintenanceSistem()
+    +monitoringLogKeamananData()
+    +backupDatabase()
+    +mengaturRoleAkses()
+}
+
+' Produk dan Katalog
+ENTITY Produk {
+    ATTRIBUTE(id_produk, int)
+    ATTRIBUTE(nama_produk, string)
+    ATTRIBUTE(deskripsi, text)
+    ATTRIBUTE(harga, decimal)
+    ATTRIBUTE(stok, int)
+    ATTRIBUTE(gambar_url, string)
+    ATTRIBUTE(spesifikasi, text)
+    +tampilkanProduk()
+    +tambahProduk()
+    +ubahProduk()
+    +hapusProduk()
+}
+
+' Keranjang Belanja
+ENTITY Keranjang {
+    ATTRIBUTE(id_keranjang, int)
+    ATTRIBUTE(tanggal_dibuat, date)
+    ATTRIBUTE(total_harga, decimal)
+    +tambahProduk(produk: Produk, jumlah: int)
+    +ubahJumlahProduk(produk: Produk, jumlah: int)
+    +hapusProduk(produk: Produk)
+    +checkout()
+}
+
+ENTITY ItemKeranjang {
+    ATTRIBUTE(id_item_keranjang, int)
+    ATTRIBUTE(jumlah, int)
+    ATTRIBUTE(harga_saat_checkout, decimal)
+}
+
+' Pesanan dan Transaksi
+ENTITY Pesanan {
+    ATTRIBUTE(id_pesanan, int)
+    ATTRIBUTE(tanggal_pesan, date)
+    ATTRIBUTE(total_pembayaran, decimal)
+    ATTRIBUTE(status_pesanan, string)
+    ATTRIBUTE(alamat_pengiriman, string)
+    +lihatStatusPesanan()
+    +memprosesPesanan()
+}
+
+ENTITY ItemPesanan {
+    ATTRIBUTE(id_item_pesanan, int)
+    ATTRIBUTE(jumlah, int)
+    ATTRIBUTE(harga_satuan, decimal)
+}
+
+ENTITY Pembayaran {
+    ATTRIBUTE(id_pembayaran, int)
+    ATTRIBUTE(metode, string)
+    ATTRIBUTE(jumlah_bayar, decimal)
+    ATTRIBUTE(tanggal_bayar, datetime)
+    ATTRIBUTE(status_pembayaran, string)
+    ATTRIBUTE(bukti_transfer_url, string)
+    +konfirmasiPembayaran(bukti: url)
+}
+
+' Laporan
+ENTITY LaporanPenjualan {
+    ATTRIBUTE(id_laporan, int)
+    ATTRIBUTE(periode_mulai, date)
+    ATTRIBUTE(periode_akhir, date)
+    ATTRIBUTE(total_pendapatan, decimal)
+    ATTRIBUTE(jumlah_pesanan, int)
+    +generateLaporan()
+}
+
+' Relasi Antar Kelas
+Admin <|-- AdminOperasional
+Admin <|-- AdminIT
+
+' Asosiasi/Agregasi
+Pengguna "1" -- "0..1" Keranjang : memiliki >
+Keranjang "1" *-- "*" ItemKeranjang : terdiri dari >
+ItemKeranjang "1" -- "1" Produk : untuk >
+
+Pengguna "1" -- "*" Pesanan : melakukan >
+Pesanan "1" *-- "*" ItemPesanan : terdiri dari >
+ItemPesanan "1" -- "1" Produk : untuk >
+
+Pesanan "1" -- "1" Pembayaran : terkait dengan >
+
+AdminOperasional "1" -- "*" Produk : mengelola >
+AdminOperasional "1" -- "*" Pesanan : mengelola >
+AdminOperasional "1" -- "*" LaporanPenjualan : membuat >
+
+@enduml

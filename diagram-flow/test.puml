@@ -1,0 +1,29 @@
+@startuml user 
+
+|User|
+start
+:Buka Aplikasi;
+|Sistem|
+:Load Halaman Awal;
+:Autentikasi Login;  
+|User|
+if (Punya Akun) then (Ya)
+|Sistem|
+:Redirect halaman login;
+|User|
+:Input Email;
+:Input Password;
+
+else (Tidak)
+|Sistem|
+:Redirect halaman registrasi;
+|User|
+
+:Input Email;
+:Input Password;
+:Input No Telepon;
+|Sistem|
+
+
+
+@enduml

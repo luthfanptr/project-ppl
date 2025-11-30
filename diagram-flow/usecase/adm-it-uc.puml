@@ -1,0 +1,17 @@
+@startuml Usecase Admin IT
+left to right direction
+actor "Admin IT" as adm 
+
+package "Sistem E-commerce" {
+    usecase "Maintenance sistem" as u1
+    usecase "Monitoring log keamanan data" as u2
+    usecase "Backup database" as u3
+    usecase "Mengatur role akses" as u4
+}
+
+adm --> u1
+adm --> u2 
+adm --> u3
+adm --> u4
+
+@enduml
